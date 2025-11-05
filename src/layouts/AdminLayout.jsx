@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { BiHome, BiBuildingHouse, BiUser, BiFolder, BiMap, BiLogOut } from "react-icons/bi";
+import {
+  BiHome,
+  BiBuildingHouse,
+  BiUser,
+  BiFolder,
+  BiMap,
+  BiLogOut,
+} from "react-icons/bi";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -8,24 +15,19 @@ const AdminLayout = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
+  const [totalEntries, setTotalEntries] = useState(0);
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 992);
-      if (window.innerWidth >= 992) {
-        setSidebarOpen(true);
-      } else {
-        setSidebarOpen(false);
-      }
+      if (window.innerWidth >= 992) setSidebarOpen(true);
+      else setSidebarOpen(false);
     };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const menuItems = [
     { path: "/", icon: <BiHome />, label: "Dashboard" },
@@ -37,54 +39,68 @@ const AdminLayout = () => {
     { path: "/bank-details", icon: <BiBuildingHouse />, label: "Bank Details" },
   ];
 
+  // 🧠 Determine current page title from menuItems
+  const currentTitle =
+    menuItems.find((item) => item.path === location.pathname)?.label ||
+    "Dashboard";
+
   return (
     <div className="d-flex">
       {/* Sidebar */}
-      <div 
-        className={`bg-dark text-white p-3 vh-100 ${sidebarOpen ? 'd-block' : 'd-none d-lg-block'}`} 
-        style={{ 
-          width: '20%',
-          minWidth: '250px',
-          maxWidth: '300px',
-          position: 'fixed',
+      <div
+        className={`bg-dark text-white p-3 vh-100 ${
+          sidebarOpen ? "d-block" : "d-none d-lg-block"
+        }`}
+        style={{
+          width: "250px",
+          position: "fixed",
           left: 0,
           top: 0,
           bottom: 0,
-          transition: 'all 0.3s',
-          overflowY: 'auto',
-          zIndex: 1001
+          overflowY: "auto",
+          transition: "all 0.3s",
+          zIndex: 1001,
         }}
       >
-        <div className="d-flex align-items-center mb-3">
-          <h5 className="fw-bold mb-0">{sidebarOpen ? '🏠 RIYASAT VATIKA' : '🏠'}</h5>
-          {sidebarOpen && <p className="text-secondary small ms-2 mb-0">PHASE - 1</p>}
-        </div>
-        <ul className="nav flex-column">
-          {menuItems.map((item) => (
-            <li key={item.path} className="nav-item mb-2">
-              <Link
-                to={item.path}
-                className={`nav-link text-white d-flex align-items-center gap-2 ${
-                  location.pathname === item.path ? "active bg-primary rounded-2 px-2" : ""
-                }`}
-                onClick={() => isMobile && setSidebarOpen(false)}
-              >
-                {item.icon}
-                {sidebarOpen && <span>{item.label}</span>}
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-auto pt-3 border-top">
-          <Link to="/logout" className="nav-link text-white d-flex align-items-center gap-2">
-            <BiLogOut /> {sidebarOpen && <span>Logout</span>}
-          </Link>
+        <div className="d-flex flex-column h-100">
+          <div className="mb-3">
+            <h5 className="fw-bold mb-0">🏠 RIYASAT VATIKA</h5>
+            <p className="text-secondary small mb-0">PHASE - 1</p>
+          </div>
+
+          <ul className="nav flex-column">
+            {menuItems.map((item) => (
+              <li key={item.path} className="nav-item mb-1">
+                <Link
+                  to={item.path}
+                  className={`nav-link text-white d-flex align-items-center gap-2 ${
+                    location.pathname === item.path
+                      ? "active bg-primary rounded-2 px-2"
+                      : ""
+                  }`}
+                  onClick={() => isMobile && setSidebarOpen(false)}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-auto pt-3 border-top">
+            <Link
+              to="/logout"
+              className="nav-link text-white d-flex align-items-center gap-2"
+            >
+              <BiLogOut /> <span>Logout</span>
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* Overlay for mobile */}
       {isMobile && sidebarOpen && (
-        <div 
+        <div
           className="position-fixed bg-dark bg-opacity-50 w-100 h-100"
           style={{ zIndex: 1000, top: 0, left: 0 }}
           onClick={() => setSidebarOpen(false)}
@@ -92,22 +108,26 @@ const AdminLayout = () => {
       )}
 
       {/* Main Content */}
-      <div 
-        className="flex-grow-1 d-flex flex-column min-vh-100"
-        style={{ 
-          marginLeft: '20%',
-          width: '80%',
-          minWidth: 'calc(100% - 300px)',
-          transition: 'all 0.3s',
-          backgroundColor: '#f8f9fa',
-          minHeight: '100vh'
+      <div
+        className="flex-grow-1 d-flex flex-column"
+        style={{
+          marginLeft: isMobile ? "0" : "250px",
+          transition: "all 0.3s",
+          backgroundColor: "#f8f9fa",
+          minHeight: "100vh",
         }}
       >
-        <Navbar toggleSidebar={toggleSidebar} />
-        
-        {/* Page Content */}
-        <main className="flex-grow-1 p-4">
-          <Outlet />
+        {/* 🔽 Pass the current page name to Navbar */}
+        <Navbar 
+          toggleSidebar={toggleSidebar} 
+          currentPage={currentTitle} 
+          totalEntries={totalEntries} 
+        />
+
+        <main className="flex-grow-1" style={{ width: "100%" }}>
+          <div className="page-wrapper">
+            <Outlet context={{ setTotalEntries }} />
+          </div>
         </main>
 
         <Footer />

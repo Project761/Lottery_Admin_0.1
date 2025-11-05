@@ -1,5 +1,5 @@
 /* Layout */
-html, body, #root {
+html, body {
   height: 100%;
   margin: 0;
   padding: 0
@@ -57,6 +57,13 @@ html, body, #root {
 }
 .main-content.expanded {
   margin-left: 0;
+}
+.page-wrapper {
+  width: 100%;
+  max-width: 100%;
+  padding: 1.5rem 2rem;
+  background-color: #f8f9fa;
+  overflow-x: hidden;
 }
 
 /* Navbar */
@@ -182,6 +189,51 @@ footer {
 
 .btn-sm {
   font-size: 0.875rem;
+}
+
+
+/* Login css */
+/* Full background */
+.login-bg {
+  background: url("https://images.unsplash.com/photo-1506744038136-46273834b3fb")
+    no-repeat center center/cover;
+  flex-direction: column;
+}
+
+/* Card styling */
+.login-card {
+  width: 360px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Header */
+.login-header {
+  background: linear-gradient(135deg, #e91e63, #f06292);
+  border: none;
+  padding: 1.2rem;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+/* Button */
+.login-btn {
+  background: linear-gradient(135deg, #e91e63, #f06292);
+  border: none;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+.login-btn:hover {
+  background: linear-gradient(135deg, #d81b60, #ec407a);
+}
+
+/* Footer */
+.login-footer {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  font-size: 0.9rem;
 }
 
 
