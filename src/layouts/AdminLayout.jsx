@@ -11,7 +11,7 @@ import {
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-const AdminLayout = () => {
+const AdminLayout = ({ onLogout }) => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
@@ -88,12 +88,17 @@ const AdminLayout = () => {
           </ul>
 
           <div className="mt-auto pt-3 border-top">
-            <Link
-              to="/logout"
-              className="nav-link text-white d-flex align-items-center gap-2"
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                if (window.confirm('Are you sure you want to logout?')) {
+                  onLogout();
+                }
+              }}
+              className="nav-link text-white d-flex align-items-center gap-2 w-100 bg-transparent border-0"
             >
               <BiLogOut /> <span>Logout</span>
-            </Link>
+            </button>
           </div>
         </div>
       </div>
@@ -121,7 +126,8 @@ const AdminLayout = () => {
         <Navbar 
           toggleSidebar={toggleSidebar} 
           currentPage={currentTitle} 
-          totalEntries={totalEntries} 
+          totalEntries={totalEntries}
+          onLogout={onLogout}
         />
 
         <main className="flex-grow-1" style={{ width: "100%" }}>

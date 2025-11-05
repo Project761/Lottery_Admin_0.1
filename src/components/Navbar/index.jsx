@@ -7,7 +7,7 @@ const NavbarComponent = ({ toggleSidebar, currentPage, totalEntries, onLogout })
 
   return (
     <Navbar bg="white" className="shadow-sm px-4 py-2 d-flex align-items-center" style={{
-      position: "sticky", 
+      position: "sticky",
       top: 0,
       zIndex: 1030,
     }}>
@@ -20,18 +20,22 @@ const NavbarComponent = ({ toggleSidebar, currentPage, totalEntries, onLogout })
         <FaBars />
       </Button>
 
-      {/* 🔽 Dynamic Page Title with total entries */}
+      {/* Page Title with conditional total entries */}
       <div className="flex-grow-1 d-flex align-items-center">
         <span className="fw-bold text-capitalize fs-5 me-2">
           {currentPage}
         </span>
 
-        {totalEntries !== undefined && (
-          <span className="text-muted small">
-            – Total {currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}:{" "}
-            <strong>{totalEntries}</strong>
-          </span>
-        )}
+        {/* Show total entries only on specific pages */}
+        {totalEntries !== undefined &&
+          currentPage.toLowerCase() !== 'dashboard' &&
+          currentPage.toLowerCase() !== 'application' &&
+          currentPage.toLowerCase() !== 'bankdetails' && (
+            <span className="text-muted small">
+              – Total {currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}:{" "}
+              <strong>{totalEntries}</strong>
+            </span>
+          )}
       </div>
 
       {/* Right-side user dropdown */}
@@ -65,17 +69,17 @@ const NavbarComponent = ({ toggleSidebar, currentPage, totalEntries, onLogout })
               <hr className="dropdown-divider" />
             </li>
             <li>
-              <button 
-              className="dropdown-item d-flex align-items-center" 
-              onClick={(e) => {
-                e.preventDefault();
-                if (window.confirm('Are you sure you want to logout?')) {
-                  onLogout();
-                }
-              }}
-            >
-              <FaSignOutAlt className="me-2" /> Logout
-            </button>
+              <button
+                className="dropdown-item d-flex align-items-center"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (window.confirm('Are you sure you want to logout?')) {
+                    onLogout();
+                  }
+                }}
+              >
+                <FaSignOutAlt className="me-2" /> Logout
+              </button>
             </li>
           </ul>
         </div>
