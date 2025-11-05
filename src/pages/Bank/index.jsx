@@ -67,7 +67,7 @@ const Bank = () => {
   }));
 
   return (
-    <div className="w-100 container-fluid  px-3 py-3" style={{ backgroundColor: "#f8f9fa" }}>
+    <div className="w-100" style={{ backgroundColor: "#f8f9fa", minHeight: 'calc(100vh - 120px)' }}>
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <h4 className="fw-bold mb-0">
@@ -85,7 +85,7 @@ const Bank = () => {
       </div>
 
       {/* Full-width DataTable wrapper */}
-      <div className="bg-white p-3 shadow-sm rounded-3" style={{ width: "100%" }}>
+      <div className="bg-white p-3 shadow-sm rounded-3" style={{ width: '100%', margin: '0 -15px' }}>
         <DataTable
           title="Bank List"
           columns={columns}

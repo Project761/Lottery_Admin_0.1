@@ -42,10 +42,23 @@ const AdminLayout = () => {
       {/* Sidebar */}
       <div 
         className={`bg-dark text-white p-3 vh-100 ${sidebarOpen ? 'd-block' : 'd-none d-lg-block'}`} 
-        style={{ width: "250px", position: "fixed" }}
+        style={{ 
+          width: '20%',
+          minWidth: '250px',
+          maxWidth: '300px',
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          transition: 'all 0.3s',
+          overflowY: 'auto',
+          zIndex: 1001
+        }}
       >
-        <h5 className="fw-bold mb-0">🏠 RIYASAT VATIKA</h5>
-        <p className="text-secondary small">PHASE - 1</p>
+        <div className="d-flex align-items-center mb-3">
+          <h5 className="fw-bold mb-0">{sidebarOpen ? '🏠 RIYASAT VATIKA' : '🏠'}</h5>
+          {sidebarOpen && <p className="text-secondary small ms-2 mb-0">PHASE - 1</p>}
+        </div>
         <ul className="nav flex-column">
           {menuItems.map((item) => (
             <li key={item.path} className="nav-item mb-2">
@@ -57,14 +70,14 @@ const AdminLayout = () => {
                 onClick={() => isMobile && setSidebarOpen(false)}
               >
                 {item.icon}
-                {item.label}
+                {sidebarOpen && <span>{item.label}</span>}
               </Link>
             </li>
           ))}
         </ul>
         <div className="mt-auto pt-3 border-top">
           <Link to="/logout" className="nav-link text-white d-flex align-items-center gap-2">
-            <BiLogOut /> Logout
+            <BiLogOut /> {sidebarOpen && <span>Logout</span>}
           </Link>
         </div>
       </div>
@@ -81,7 +94,14 @@ const AdminLayout = () => {
       {/* Main Content */}
       <div 
         className="flex-grow-1 d-flex flex-column min-vh-100"
-        style={{ marginLeft: sidebarOpen ? "250px" : "0", transition: 'margin-left 0.3s' }}
+        style={{ 
+          marginLeft: '20%',
+          width: '80%',
+          minWidth: 'calc(100% - 300px)',
+          transition: 'all 0.3s',
+          backgroundColor: '#f8f9fa',
+          minHeight: '100vh'
+        }}
       >
         <Navbar toggleSidebar={toggleSidebar} />
         
