@@ -57,7 +57,7 @@ const BankDetails = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.id) {
-      setBankDetails(bankDetails.map(bank => 
+      setBankDetails(bankDetails.map(bank =>
         bank.id === formData.id ? { ...formData } : bank
       ));
     } else {
@@ -89,10 +89,10 @@ const BankDetails = () => {
     }
   };
 
-  const filteredBanks = bankDetails.filter(bank => 
+  const filteredBanks = bankDetails.filter(bank =>
     Object.values(bank).some(
-      value => value && 
-      value.toString().toLowerCase().includes(search.toLowerCase())
+      value => value &&
+        value.toString().toLowerCase().includes(search.toLowerCase())
     )
   );
 
@@ -164,40 +164,43 @@ const BankDetails = () => {
 
   return (
     <>
-      <DataTable
-        title="Bank Details"
-        icon="🏦"
-        columns={columns}
-        data={filteredBanks}
-        search={search}
-        setSearch={setSearch}
-        entries={entries}
-        setEntries={setEntries}
-        page={page}
-        setPage={setPage}
-        sortConfig={sortConfig}
-        onSort={handleSort}
-      >
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={() => {
-            setFormData({
-              bankName: '',
-              accountNumber: '',
-              accountHolder: '',
-              ifscCode: '',
-              branch: '',
-              status: 'Active'
-            });
-            setShowModal(true);
-          }}
-          className="mb-3"
-        >
-          <FaPlus className="me-1" /> Add Bank
-        </Button>
-      </DataTable>
-
+      <div className="card">
+        <div className="card-body">
+          <DataTable
+            // title="Bank Details"
+            // icon="🏦"
+            columns={columns}
+            data={filteredBanks}
+            search={search}
+            setSearch={setSearch}
+            entries={entries}
+            setEntries={setEntries}
+            page={page}
+            setPage={setPage}
+            sortConfig={sortConfig}
+            onSort={handleSort}
+          >
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                setFormData({
+                  bankName: '',
+                  accountNumber: '',
+                  accountHolder: '',
+                  ifscCode: '',
+                  branch: '',
+                  status: 'Active'
+                });
+                setShowModal(true);
+              }}
+              className="mb-3"
+            >
+              <FaPlus className="me-1" /> Add Bank
+            </Button>
+          </DataTable>
+        </div>
+      </div>
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>
@@ -259,14 +262,14 @@ const BankDetails = () => {
             <Form.Group>
               <Form.Label>Status</Form.Label>
               <Form.Select
-              name="status"
-              value={formData.status}
-              onChange={handleInputChange}
-              required
-            >
-              <option value='Active'>Active</option>
-              <option value='Inactive'>Inactive</option>
-            </Form.Select>
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                required
+              >
+                <option value='Active'>Active</option>
+                <option value='Inactive'>Inactive</option>
+              </Form.Select>
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>

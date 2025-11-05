@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaBuilding } from "react-icons/fa";
 import DataTable from "../../components/DataTable";
+import AddEditModal from "../../components/AddEditModal";
 
 const Project = () => {
   const [projects, setProjects] = useState([
@@ -53,22 +54,17 @@ const Project = () => {
   };
 
   const columns = [
-    {
-      key: "name",
-      label: "Project Name",
-      sortable: true,
-    },
-    {
-      key: "location",
-      label: "Location",
-      sortable: true,
-    },
+    { key: "name", label: "Project Name", sortable: true },
+    { key: "location", label: "Location", sortable: true },
     {
       key: "status",
       label: "Status",
       sortable: true,
       render: (item) => (
-        <span className={`badge ${item.status === "Active" ? "bg-success" : "bg-secondary"}`}>
+        <span
+          className={`badge ${item.status === "Active" ? "bg-success" : "bg-secondary"
+            }`}
+        >
           {item.status}
         </span>
       ),
@@ -76,26 +72,16 @@ const Project = () => {
   ];
 
   return (
-    <div className="container-fluid p-0">
+    <div className="page-wrapper">
       <div className="card shadow-sm border-0">
         <div className="card-body p-4">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h4 className="fw-bold mb-0">
-              <span className="me-2">🏗️</span>Project Management
-            </h4>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setShowAddModal(true)}
-            >
-              <FaPlus className="me-1" /> Add Project
-            </Button>
-          </div>
-          
+
+
           <DataTable
             title="Project List"
             columns={columns}
             data={filtered}
+            onDelete={handleDelete}
             search={search}
             setSearch={setSearch}
             entries={entries}
@@ -104,63 +90,24 @@ const Project = () => {
             setPage={setPage}
             sortConfig={sortConfig}
             onSort={handleSort}
-            onDelete={handleDelete}
+            showAddButton={true}
+            addButtonText="Add Project"
+            onAddClick={() => setShowAddModal(true)}
           />
         </div>
       </div>
 
-      {/* Add Project Modal */}
-      <Modal show={showAddModal} onHide={() => setShowAddModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add New Project</Modal.Title>
-        </Modal.Header>
-        <form onSubmit={handleAddProject}>
-          <Modal.Body>
-            <Form.Group className="mb-3">
-              <Form.Label>Project Name</Form.Label>
-              <Form.Control
-                type="text"
-                value={newProject.name}
-                onChange={(e) =>
-                  setNewProject({ ...newProject, name: e.target.value })
-                }
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Location</Form.Label>
-              <Form.Control
-                type="text"
-                value={newProject.location}
-                onChange={(e) =>
-                  setNewProject({ ...newProject, location: e.target.value })
-                }
-                required
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Status</Form.Label>
-              <Form.Select
-                value={newProject.status}
-                onChange={(e) =>
-                  setNewProject({ ...newProject, status: e.target.value })
-                }
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </Form.Select>
-            </Form.Group>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowAddModal(false)}>
-              Close
-            </Button>
-            <Button variant="primary" type="submit">
-              Save changes
-            </Button>
-          </Modal.Footer>
-        </form>
-      </Modal>
+      <AddEditModal show={showAddModal} onHide={() => setShowAddModal(false)} title="Add New Project" formFields={[
+        {
+          name: 'name',
+          label: 'Project Name',
+          placeholder: 'Enter project name',
+          autoFocus: true,
+          required: true,
+        },
+       
+      ]} formData={newProject} onInputChange={(e) => setNewProject({ ...newProject, [e.target.name]: e.target.value })} onSubmit={handleAddProject} />
+
     </div>
   );
 };

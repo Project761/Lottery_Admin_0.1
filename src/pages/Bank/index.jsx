@@ -1,105 +1,73 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaUniversity } from "react-icons/fa";
 import DataTable from "../../components/DataTable";
+import AddEditModal from "../../components/AddEditModal";
 
 const Bank = () => {
   const allBanks = [
-    "Andhra Bank",
-    "Allahabad Bank",
-    "BANK OF BARODA",
-    "Bank of India",
-    "BANK OF MAHARASHTRA",
-    "Bandhan Bank Ltd.",
-    "Bank of Rajsthan",
-    "Central Bank of India",
-    "CORPORATION BANK",
-    "Dena Bank",
-    "Punjab National Bank",
-    "ICICI Bank",
-    "HDFC Bank",
-    "Axis Bank",
-    "Canara Bank",
-    "Union Bank of India",
-    "Indian Bank",
-    "Indian Overseas Bank",
-    "Yes Bank",
-    "Kotak Mahindra Bank",
-    "UCO Bank",
-    "IDBI Bank",
-    "Federal Bank",
-    "South Indian Bank",
-    "IndusInd Bank",
-    "City Union Bank",
-    "Karur Vysya Bank",
-    "Bank of Rajasthan",
-    "Bandhan Bank",
+    "Andhra Bank", "Allahabad Bank", "BANK OF BARODA", "Bank of India",
+    "BANK OF MAHARASHTRA", "Bandhan Bank Ltd.", "Bank of Rajsthan",
+    "Central Bank of India", "CORPORATION BANK", "Dena Bank",
+    "Punjab National Bank", "ICICI Bank", "HDFC Bank", "Axis Bank",
+    "Canara Bank", "Union Bank of India", "Indian Bank",
+    "Indian Overseas Bank", "Yes Bank", "Kotak Mahindra Bank",
+    "UCO Bank", "IDBI Bank", "Federal Bank", "South Indian Bank",
+    "IndusInd Bank", "City Union Bank", "Karur Vysya Bank",
+    "Bank of Rajasthan", "Bandhan Bank"
   ];
 
   const [banks, setBanks] = useState(allBanks);
-  const [search, setSearch] = useState("");
-  const [entries, setEntries] = useState(10);
-  const [page, setPage] = useState(1);
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [formData, setFormData] = useState({ name: "" });
 
-  const handleSort = (key) => {
-    setSortConfig((prev) => ({
-      key,
-      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
-    }));
-  };
-
-  const filtered = banks.filter((bank) =>
-    bank.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const handleDelete = (bankName) => {
-    if (window.confirm(`Are you sure you want to delete "${bankName}"?`)) {
-      setBanks((prev) => prev.filter((b) => b !== bankName));
+  const handleDelete = (bank) => {
+    if (window.confirm(`Are you sure you want to delete "${bank.name}"?`)) {
+      setBanks((prev) => prev.filter((b) => b !== bank.name));
     }
   };
 
-  const columns = [{ key: "name", label: "Bank Name", sortable: true }];
+  // Columns must use text + dataField for DataTable
+  const columns = [
+    { text: "S.No", dataField: "id" },
+    { text: "Bank Name", dataField: "name" },
+  ];
 
-  const tableData = filtered.map((bank, i) => ({
+  const tableData = banks.map((bank, i) => ({
     id: i + 1,
     name: bank,
   }));
 
   return (
-    <div className="w-100 container-fluid  px-3 py-3" style={{ backgroundColor: "#f8f9fa" }}>
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <h4 className="fw-bold mb-0">
-          <span className="me-2">🏦</span> Bank Management
-        </h4>
-
-        <Button
-          variant="primary"
-          size="sm"
-          className="d-flex align-items-center"
-          onClick={() => alert("Add new bank functionality will go here")}
-        >
-          <FaPlus className="me-2" /> Add Bank
-        </Button>
+    <div className="card p-1">
+      <div className="card-body p-1">
+        <div className="page-wrapper">
+          <DataTable
+            // title="Bank Management"
+            // icon={<FaUniversity />}
+            columns={columns}
+            data={tableData}
+            onAddClick={() => setShowAddModal(true)}
+            onDelete={handleDelete}
+            showAddButton={true}
+            addButtonText="Add Bank"
+          />
+        </div>
       </div>
-
-      {/* Full-width DataTable wrapper */}
-      <div className="bg-white p-3 shadow-sm rounded-3" style={{ width: "100%" }}>
-        <DataTable
-          title="Bank List"
-          columns={columns}
-          data={tableData}
-          entries={entries}
-          page={page}
-          setPage={setPage}
-          sortConfig={sortConfig}
-          onSort={handleSort}
-          onDelete={handleDelete}
-          search={search}
-          setSearch={setSearch}
-        />
-      </div>
+      <AddEditModal show={showAddModal} onHide={() => setShowAddModal(false)} title="Add New Bank" formFields={[
+        {
+          name: 'name',
+          label: 'Bank Name',
+          placeholder: 'Enter bank name',
+          autoFocus: true,
+          required: true,
+        },
+      ]} formData={formData} onInputChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })} onSubmit={(e) => {
+        e.preventDefault();
+        setBanks([...banks, { id: banks.length + 1, name: formData.name }]);
+        setShowAddModal(false);
+        setFormData({ name: '' });
+      }} />
     </div>
   );
 };
