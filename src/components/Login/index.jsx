@@ -1,91 +1,119 @@
 import React, { useState } from "react";
-import { Form, Button, Card } from "react-bootstrap";
+import axios from "axios";
+import { Form, Button, Card, Spinner } from "react-bootstrap";
+
+// ✅ Set your base URL
+axios.defaults.baseURL = "https://lotteryapi.arustu.com/api/";
 
 const Login = ({ onLogin }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [remember, setRemember] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Here you would typically validate credentials with your backend
-    // For now, we'll just check if email and password are not empty
-    if (email && password) {
-      onLogin(); // This will be handled by the parent component
-    } else {
-      alert('Please enter both email and password');
-    }
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-  return (
-    <div className="login-bg d-flex justify-content-center align-items-center vh-100">
-      <Card className="login-card shadow-lg border-0">
-        <Card.Header className="text-center login-header">
-          <h4 className="mb-0 text-white fw-bold">Sign in</h4>
-        </Card.Header>
-        <Card.Body className="p-4">
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Control
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </Form.Group>
+        if (!username || !password) {
+            alert("Please enter both username and password");
+            return;
+        }
 
-            <Form.Group className="mb-3">
-              <Form.Control
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </Form.Group>
+        setLoading(true);
 
-            <div className="d-flex align-items-center mb-3">
-              <Form.Check
-                type="switch"
-                id="remember"
-                label="Remember me"
-                checked={remember}
-                onChange={() => setRemember(!remember)}
-              />
-            </div>
+        try {
+            // ✅ Call your API
+            const response = await axios.post("AppUser/LOGIN_AppUser", {
+                UserName: username,
+                Password: password,
+                grant_type: "password",
+            });
 
-            <Button
-              variant="danger"
-              type="submit"
-              className="w-100 py-2 login-btn"
-            >
-              LOGIN
-            </Button>
-          </Form>
+            const data = response.data;
+            console.log(data, "data");
 
-          <div className="text-center mt-3">
-            <a href="/" className="text-decoration-none small text-primary">
-              Back to Home Page
-            </a>
-          </div>
-        </Card.Body>
-      </Card>
+            // ✅ Successful login check
+            if (data && data.access_token) {
+                // Save important info in localStorage
+                localStorage.setItem("access_token", data.access_token);
+                localStorage.setItem("FullName", data.FullName);
+                localStorage.setItem("UserID", data.UserID);
+                localStorage.setItem("isAuthenticated", "true");
+                alert(data.error_description || "Login successful");
+                onLogin(); 
+            } else {
+                alert(data.error_description || "Invalid credentials!");
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+            if (error.response) {
+                alert(
+                    `Login failed: ${error.response.data.error_description || "Invalid credentials"}`
+                );
+            } else {
+                alert("Unable to connect to the server. Please check the API or network.");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      <footer className="login-footer text-center text-light mt-3">
-        © 2025, made with ❤️ by{" "}
-        <a
-          href="https://arustutechnology.com"
-          target="_blank"
-          rel="noreferrer"
-          className="text-info fw-semibold text-decoration-none"
-        >
-          Arustu Technology
-        </a>{" "}
-        for a better web.
-      </footer>
-    </div>
-  );
+    return (
+        <div className="login-bg d-flex justify-content-center align-items-center vh-100">
+            <Card className="login-card shadow-lg border-0">
+                <Card.Header className="text-center login-header">
+                    <h4 className="mb-0 text-white fw-bold">Sign in</h4>
+                </Card.Header>
+                <Card.Body className="p-4">
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group className="mb-3">
+                            <Form.Control
+                                type="text"
+                                placeholder="Username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Control
+                                type="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </Form.Group>
+                        <div className="d-flex align-items-center mb-3">
+                            <Form.Check type="switch" id="remember" label="Remember me" checked={remember} onChange={() => setRemember(!remember)} /> </div>
+
+                        <Button
+                            variant="danger"
+                            type="submit"
+                            className="w-100 py-2 login-btn"
+                            disabled={loading}
+                        >
+                            {loading ? <Spinner animation="border" size="sm" /> : "LOGIN"}
+                        </Button>
+                    </Form>
+                </Card.Body>
+            </Card>
+
+            <footer className="login-footer text-center text-light mt-3">
+                © 2025, made with ❤️ by{" "}
+                <a
+                    href="https://arustutechnology.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-info fw-semibold text-decoration-none"
+                >
+                    Arustu Technology
+                </a>{" "}
+                for a better web.
+            </footer>
+        </div>
+    );
 };
 
 export default Login;
