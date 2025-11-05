@@ -1,145 +1,118 @@
-import React, { useState, useEffect } from "react";
-import { Form, Button, Card, Spinner, Alert } from "react-bootstrap";
+import React, { useState } from "react";
 import axios from "axios";
+import { Form, Button, Card, Spinner } from "react-bootstrap";
+
+// ✅ Set your base URL
+axios.defaults.baseURL = "https://lotteryapi.arustu.com/api/";
 
 const Login = ({ onLogin }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(null);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [remember, setRemember] = useState(false);
 
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  const LOGIN_API = `${BASE_URL}/api/AppUser/LOGIN_AppUser`;
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-  useEffect(() => {
-    const token =
-      localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
-    if (token) onLogin({ alreadyLoggedIn: true });
-  }, [onLogin]);
+        if (!username || !password) {
+            alert("Please enter both username and password");
+            return;
+        }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMsg(null);
+        setLoading(true);
 
-    if (!username.trim() || !password) {
-      setErrorMsg("Please enter both username and password.");
-      return;
-    }
+        try {
+            // ✅ Call your API
+            const response = await axios.post("AppUser/LOGIN_AppUser", {
+                UserName: username,
+                Password: password,
+                grant_type: "password",
+            });
 
-    setLoading(true);
+            const data = response.data;
+            console.log(data, "data");
 
-    try {
-      const payload = { UserName: username.trim(), Password: password, grant_type: "password" };
+            // ✅ Successful login check
+            if (data && data.access_token) {
+                // Save important info in localStorage
+                localStorage.setItem("access_token", data.access_token);
+                localStorage.setItem("FullName", data.FullName);
+                localStorage.setItem("UserID", data.UserID);
+                localStorage.setItem("isAuthenticated", "true");
+                alert(data.error_description || "Login successful");
+                onLogin(); 
+            } else {
+                alert(data.error_description || "Invalid credentials!");
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+            if (error.response) {
+                alert(
+                    `Login failed: ${error.response.data.error_description || "Invalid credentials"}`
+                );
+            } else {
+                alert("Unable to connect to the server. Please check the API or network.");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      const response = await axios.post(LOGIN_API, payload, {
-        headers: { "Content-Type": "application/json" },
-        timeout: 10000,
-      });
+    return (
+        <div className="login-bg d-flex justify-content-center align-items-center vh-100">
+            <Card className="login-card shadow-lg border-0">
+                <Card.Header className="text-center login-header">
+                    <h4 className="mb-0 text-white fw-bold">Sign in</h4>
+                </Card.Header>
+                <Card.Body className="p-4">
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group className="mb-3">
+                            <Form.Control
+                                type="text"
+                                placeholder="Username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                            />
+                        </Form.Group>
 
-      const data = response.data;
+                        <Form.Group className="mb-3">
+                            <Form.Control
+                                type="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </Form.Group>
+                        <div className="d-flex align-items-center mb-3">
+                            <Form.Check type="switch" id="remember" label="Remember me" checked={remember} onChange={() => setRemember(!remember)} /> </div>
 
-      if (data.error === "200") {
-        const storage = remember ? localStorage : sessionStorage;
-        storage.setItem("access_token", data.access_token);
-        storage.setItem("refresh_token", data.refresh_token);
-        storage.setItem("FullName", data.FullName || "");
-        storage.setItem("UserID", data.UserID || "");
-        storage.setItem("remember_me", remember ? "true" : "false");
+                        <Button
+                            variant="danger"
+                            type="submit"
+                            className="w-100 py-2 login-btn"
+                            disabled={loading}
+                        >
+                            {loading ? <Spinner animation="border" size="sm" /> : "LOGIN"}
+                        </Button>
+                    </Form>
+                </Card.Body>
+            </Card>
 
-        setErrorMsg(null);
-        onLogin(data);
-      } else {
-        setErrorMsg(data.error_description || "Invalid username or password.");
-      }
-    } catch (err) {
-      console.error("Login Error:", err);
-      if (err.response?.data?.error_description) {
-        setErrorMsg(err.response.data.error_description);
-      } else if (err.code === "ECONNABORTED") {
-        setErrorMsg("Request timed out. Please try again.");
-      } else {
-        setErrorMsg("Unable to connect to the server. Please check your internet or server status.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="login-bg d-flex justify-content-center align-items-center vh-100">
-      <Card className="login-card shadow-lg border-0" style={{ maxWidth: 420, width: "95%" }}>
-        <Card.Header className="text-center login-header">
-          <h4 className="mb-0 text-white fw-bold">Sign in</h4>
-        </Card.Header>
-        <Card.Body className="p-4">
-          {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
-
-          <Form onSubmit={handleSubmit} autoComplete="off">
-            <Form.Group className="mb-3" controlId="username">
-              <Form.Label className="small">Username</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                autoFocus
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="password">
-              <Form.Label className="small">Password</Form.Label>
-              <Form.Control
-                type="password"
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </Form.Group>
-
-            <div className="d-flex align-items-center justify-content-between mb-3">
-              <Form.Check
-                type="switch"
-                id="remember"
-                label="Remember me"
-                checked={remember}
-                onChange={() => setRemember(!remember)}
-              />
-              <small className="text-muted">Forgot password? Contact admin.</small>
-            </div>
-
-            <Button variant="danger" type="submit" className="w-100 py-2 login-btn" disabled={loading}>
-              {loading ? (
-                <>
-                  <Spinner animation="border" size="sm" className="me-2" /> Signing in...
-                </>
-              ) : (
-                "LOGIN"
-              )}
-            </Button>
-          </Form>
-
-          <div className="text-center mt-3">
-            <a href="https://lottery.arustu.com" className="text-decoration-none small text-primary">
-              Back to Home Page
-            </a>
-          </div>
-        </Card.Body>
-      </Card>
-
-      <footer className="login-footer text-center text-light mt-3">
-        © 2025, made with ❤️ by{" "}
-        <a
-          href="https://arustutechnology.com"
-          target="_blank"
-          rel="noreferrer"
-          className="text-info fw-semibold text-decoration-none"
-        >
-          Arustu Technology
-        </a>{" "}
-        for a better web.
-      </footer>
-    </div>
-  );
+            <footer className="login-footer text-center text-light mt-3">
+                © 2025, made with ❤️ by{" "}
+                <a
+                    href="https://arustutechnology.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-info fw-semibold text-decoration-none"
+                >
+                    Arustu Technology
+                </a>{" "}
+                for a better web.
+            </footer>
+        </div>
+    );
 };
 export default Login;
